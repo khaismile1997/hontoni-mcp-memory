@@ -9,11 +9,23 @@ export const compactPrepareTool: Tool = {
 	name: "compact_prepare",
 	description: `Prepare context package for compaction recovery.
 
+PROACTIVE: When you notice the conversation is getting long (many back-and-forth exchanges, large tool outputs, or you feel context is heavy), automatically:
+1. Call session_save to preserve current work state
+2. Call this tool to prepare recovery context
+3. Tell the user: "Context is getting large. I've saved our progress. Please run /compact to free up space, then I'll recover our context."
+
 Purpose:
 - Generate recovery prompt for new session
 - Include current session state
 - Include recent relevant observations
-- Use before triggering /compact`,
+- Use before triggering /compact
+
+Signs context is large:
+- Many tool calls in conversation
+- Long code outputs
+- Multiple file reads
+- Deep debugging sessions
+- Conversation feels "slow" or context seems fragmented`,
 	inputSchema: {
 		type: "object",
 		properties: {},
