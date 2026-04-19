@@ -11,12 +11,23 @@ export const observationTool: Tool = {
 	name: "observation",
 	description: `Create a structured observation for future reference.
 
+PROACTIVE: Use this tool automatically when you discover something important — don't wait for user to ask. Create observations for architecture decisions, bug root causes, code patterns, gotchas, and learnings.
+
 Purpose:
 - Capture decisions, bugs, features, patterns, discoveries, learnings, or warnings
 - Auto-detects file references from content
 - Stores in SQLite with FTS5 index for fast search
+- Memory persists across sessions — build knowledge over time
 
-Type-specific examples:
+When to use (automatically):
+- Made an architecture or tech decision → type: "decision"
+- Fixed a bug with non-obvious cause → type: "bugfix"  
+- Found a recurring pattern in codebase → type: "pattern"
+- Discovered how something works → type: "discovery"
+- Found a gotcha or dangerous pattern → type: "warning"
+- Learned something new → type: "learning"
+
+Examples:
 - decision: "Use JWT for auth" - Chose JWT for stateless auth
 - bugfix: "Fix null pointer on login" - Guarded optional user
 - pattern: "Use zod for input validation" - All inputs validated with zod

@@ -18,10 +18,18 @@ export const sessionSaveTool: Tool = {
 	name: "session_save",
 	description: `Save current work context for recovery.
 
+PROACTIVE: Use this tool when ending a work session or before context might be lost. Save progress so next session can resume seamlessly.
+
 Purpose:
 - Checkpoint current work state
 - Survives /compact commands
-- Enables seamless session resume`,
+- Enables seamless session resume
+
+When to use:
+- User says "let's stop here" or "save progress"
+- Before running /compact
+- After completing a significant milestone
+- Before switching to a different task`,
 	inputSchema: {
 		type: "object",
 		properties: {

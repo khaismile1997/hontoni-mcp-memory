@@ -7,10 +7,18 @@ export const memorySearchTool: Tool = {
 	name: "memory_search",
 	description: `Search memory across observations using full-text search.
 
+PROACTIVE: Use this tool at the START of any task to check for relevant past context. Search before implementing to see if similar work was done before.
+
 Purpose:
 - Fast, ranked search across all observations (FTS5)
 - Returns compact index for progressive disclosure
 - Use memory_get for full details after identifying relevant observations
+
+When to use (automatically):
+- Starting work on a new task → search for related past work
+- About to make a decision → search for prior decisions on same topic
+- Debugging → search for similar bugs fixed before
+- Implementing feature → search for patterns used elsewhere
 
 Search modes:
 - Default searches title, narrative, facts, and concepts

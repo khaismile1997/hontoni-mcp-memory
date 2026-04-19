@@ -7,10 +7,18 @@ export const sessionLoadTool: Tool = {
 	name: "session_load",
 	description: `Load saved context for recovery.
 
+PROACTIVE: Use this tool at session START to check if there's saved context to resume from. Always check for previous session when beginning work.
+
 Purpose:
 - Retrieve saved session state
 - Resume after /compact
-- Get working context after restart`,
+- Get working context after restart
+
+When to use:
+- Starting a new conversation
+- After /compact command
+- User asks to "continue" or "resume"
+- Returning to work after a break`,
 	inputSchema: {
 		type: "object",
 		properties: {},
