@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test artifacts
+coverage/
+.nyc_output/
+
+# Local data (never commit user data)
+.hontoni-memory/
+*.db
+*.db-wal
+*.db-shm
+session.json
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment
+.env
+.env.local

@@ -1,0 +1,56 @@
+{
+	"name": "@hontoni/mcp-memory",
+	"version": "0.1.0",
+	"description": "MCP server for memory and session management with Claude Code",
+	"type": "module",
+	"main": "dist/index.js",
+	"bin": {
+		"hontoni-mcp-memory": "dist/index.js"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"homepage": "https://hontoni.vn",
+	"scripts": {
+		"build": "tsc",
+		"dev": "tsc --watch",
+		"start": "node dist/index.js",
+		"test": "vitest run",
+		"typecheck": "tsc --noEmit",
+		"clean": "rm -rf dist"
+	},
+	"keywords": [
+		"mcp",
+		"model-context-protocol",
+		"claude",
+		"memory",
+		"ai-assistant"
+	],
+	"author": "hontoni",
+	"license": "MIT",
+	"engines": {
+		"node": ">=18.0.0"
+	},
+	"dependencies": {
+		"@modelcontextprotocol/sdk": "^1.0.0",
+		"better-sqlite3": "^11.0.0",
+		"zod": "^3.23.0"
+	},
+	"devDependencies": {
+		"@types/better-sqlite3": "^7.6.11",
+		"@types/node": "^20.11.0",
+		"typescript": "^5.5.0",
+		"vitest": "^4.1.4"
+	},
+	"files": [
+		"dist",
+		"README.md"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/khaismile1997/hontoni-mcp-memory"
+	},
+	"bugs": {
+		"url": "https://github.com/khaismile1997/hontoni-mcp-memory/issues"
+	}
+}
