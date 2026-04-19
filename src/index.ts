@@ -7,6 +7,7 @@ import {
 	ListPromptsRequestSchema,
 	ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
+import { runInit } from "./cli/init.js";
 import { initDatabase } from "./db/schema.js";
 import {
 	memoryRitualContent,
@@ -15,6 +16,42 @@ import {
 import { handleToolCall, registerTools } from "./server.js";
 import { ensureDataDir, getConfig } from "./utils/config.js";
 
+// Handle CLI commands
+const command = process.argv[2];
+
+if (command === "init") {
+	runInit();
+	process.exit(0);
+}
+
+if (command === "help" || command === "--help" || command === "-h") {
+	console.log(`
+hontoni-mcp-memory - Persistent AI memory via MCP
+
+Usage:
+  npx hontoni-mcp-memory           Start MCP server (stdio)
+  npx hontoni-mcp-memory init      Create AGENTS.md template in current directory
+  npx hontoni-mcp-memory init -f   Overwrite existing AGENTS.md
+  npx hontoni-mcp-memory help      Show this help message
+
+Storage:
+  Memory is stored locally at ~/.hontoni-memory/memory.db
+  Set HONTONI_MEMORY_DIR to customize location.
+
+Documentation:
+  https://github.com/khaismile1997/hontoni-mcp-memory
+`);
+	process.exit(0);
+}
+
+// If unknown command provided, show error
+if (command && !command.startsWith("-")) {
+	console.error(`Unknown command: ${command}`);
+	console.error("Run 'npx hontoni-mcp-memory help' for usage.");
+	process.exit(1);
+}
+
+// Default: Start MCP server
 async function main() {
 	const config = getConfig();
 	ensureDataDir(config);
@@ -24,7 +61,7 @@ async function main() {
 	const server = new Server(
 		{
 			name: "hontoni-memory",
-			version: "0.2.0",
+			version: "0.2.3",
 		},
 		{
 			capabilities: {
