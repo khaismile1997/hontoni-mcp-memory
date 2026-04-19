@@ -29,10 +29,15 @@ if (command === "help" || command === "--help" || command === "-h") {
 hontoni-mcp-memory - Persistent AI memory via MCP
 
 Usage:
-  npx hontoni-mcp-memory           Start MCP server (stdio)
-  npx hontoni-mcp-memory init      Create AGENTS.md template in current directory
-  npx hontoni-mcp-memory init -f   Overwrite existing AGENTS.md
-  npx hontoni-mcp-memory help      Show this help message
+  npx hontoni-mcp-memory              Start MCP server (stdio)
+  npx hontoni-mcp-memory init         Create AGENTS.md template
+  npx hontoni-mcp-memory init -a      Append memory section to existing AGENTS.md
+  npx hontoni-mcp-memory init -f      Overwrite existing AGENTS.md
+  npx hontoni-mcp-memory help         Show this help message
+
+Flags:
+  -a, --append    Add memory section to existing AGENTS.md
+  -f, --force     Overwrite entire file
 
 Storage:
   Memory is stored locally at ~/.hontoni-memory/memory.db
@@ -61,7 +66,7 @@ async function main() {
 	const server = new Server(
 		{
 			name: "hontoni-memory",
-			version: "0.2.3",
+			version: "0.2.4",
 		},
 		{
 			capabilities: {
