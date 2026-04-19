@@ -1,4 +1,4 @@
-# @hontoni/mcp-memory
+# hontoni-mcp-memory
 
 MCP (Model Context Protocol) server for memory and session management with Claude Code.
 
@@ -18,13 +18,13 @@ This MCP server provides memory persistence and session recovery tools for AI co
 ### Via npx (recommended)
 
 ```bash
-npx @hontoni/mcp-memory
+npx hontoni-mcp-memory
 ```
 
 ### Global install
 
 ```bash
-npm install -g @hontoni/mcp-memory
+npm install -g hontoni-mcp-memory
 ```
 
 ## Configuration
@@ -32,7 +32,7 @@ npm install -g @hontoni/mcp-memory
 ### Claude Code CLI (recommended)
 
 ```bash
-claude mcp add --transport stdio hontoni-memory -- npx -y @hontoni/mcp-memory
+claude mcp add --transport stdio hontoni-memory -- npx -y hontoni-mcp-memory
 ```
 
 ### Manual config
@@ -44,7 +44,7 @@ Add to your project's `.mcp.json` or `~/.claude.json`:
   "mcpServers": {
     "hontoni-memory": {
       "command": "npx",
-      "args": ["-y", "@hontoni/mcp-memory"],
+      "args": ["-y", "hontoni-mcp-memory"],
       "env": {
         "HONTONI_DATA_DIR": "~/.hontoni-mcp"
       }
