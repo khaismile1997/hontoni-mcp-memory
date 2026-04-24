@@ -25,6 +25,7 @@ describe("Database Schema", () => {
 			dbPath: join(tempDir, "test.db"),
 			sessionPath: "",
 			backupDir: "",
+			pluginsDir: "",
 		});
 	});
 
@@ -65,6 +66,7 @@ describe("Observation CRUD", () => {
 			dbPath: join(tempDir, "test.db"),
 			sessionPath: "",
 			backupDir: "",
+			pluginsDir: "",
 		});
 	});
 
@@ -163,6 +165,7 @@ describe("Full-Text Search", () => {
 			dbPath: join(tempDir, "test.db"),
 			sessionPath: "",
 			backupDir: "",
+			pluginsDir: "",
 		});
 
 		// Seed data
@@ -236,6 +239,7 @@ describe("Timeline", () => {
 			dbPath: join(tempDir, "test.db"),
 			sessionPath: "",
 			backupDir: "",
+			pluginsDir: "",
 		});
 
 		ids = [];
@@ -289,6 +293,7 @@ describe("Stats and Admin", () => {
 			dbPath: join(tempDir, "test.db"),
 			sessionPath: "",
 			backupDir: "",
+			pluginsDir: "",
 		});
 
 		createObservation(db, { type: "decision", title: "Decision 1" });

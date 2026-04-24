@@ -27,6 +27,7 @@ describe("Tool Handlers", () => {
 			dbPath: join(tempDir, "test.db"),
 			sessionPath: join(tempDir, "session.json"),
 			backupDir: join(tempDir, "backup"),
+			pluginsDir: join(tempDir, "plugins"),
 		};
 		db = initDatabase(config);
 	});
