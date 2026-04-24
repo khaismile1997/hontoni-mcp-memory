@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "server",
+  "dolt_database": "hontoni_mcp_memory",
+  "project_id": "82168988-b578-41fa-9a57-312c34a0885b"
+}
