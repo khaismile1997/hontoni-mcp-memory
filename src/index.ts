@@ -9,11 +9,18 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { runInit } from "./cli/init.js";
 import { initDatabase } from "./db/schema.js";
+import { loadPlugins } from "./plugins.js";
 import {
 	memoryRitualContent,
 	memoryRitualPrompt,
 } from "./prompts/memory-ritual.js";
-import { handleToolCall, registerTools } from "./server.js";
+import {
+	buildToolRegistry,
+	dispatchToolCall,
+	getToolSchemas,
+	handleToolCall,
+	registerTools,
+} from "./server.js";
 import { ensureDataDir, getConfig } from "./utils/config.js";
 
 // Handle CLI commands
@@ -63,6 +70,48 @@ async function main() {
 
 	const db = initDatabase(config);
 
+	// Build mutable tool registry (built-ins + plugins)
+	const registry = buildToolRegistry(db, config);
+
+	// Load plugins and add their tools to the registry
+	const plugins = await loadPlugins(config.pluginsDir, db);
+	for (const plugin of plugins) {
+		for (const tool of plugin.tools) {
+			registry.set(tool.name, {
+				schema: {
+					name: tool.name,
+					description: tool.description,
+					inputSchema: tool.inputSchema,
+				},
+				handler: (args) => {
+					try {
+						const result = tool.handler(args, db);
+						return {
+							content: [
+								{
+									type: "text" as const,
+									text: JSON.stringify(result, null, 2),
+								},
+							],
+						};
+					} catch (error) {
+						return {
+							content: [
+								{
+									type: "text" as const,
+									text: JSON.stringify({
+										error:
+											error instanceof Error ? error.message : String(error),
+									}),
+								},
+							],
+						};
+					}
+				},
+			});
+		}
+	}
+
 	const server = new Server(
 		{
 			name: "hontoni-memory",
@@ -76,18 +125,17 @@ async function main() {
 		},
 	);
 
-	// Register tool listing handler
+	// Register tool listing handler — uses the live registry
 	server.setRequestHandler(ListToolsRequestSchema, async () => {
 		return {
-			tools: registerTools(),
+			tools: getToolSchemas(registry),
 		};
 	});
 
-	// Register tool call handler
+	// Register tool call handler — dispatches through registry
 	server.setRequestHandler(CallToolRequestSchema, async (request) => {
-		return handleToolCall(
-			db,
-			config,
+		return dispatchToolCall(
+			registry,
 			request.params.name,
 			request.params.arguments ?? {},
 		);

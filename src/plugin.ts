@@ -1,3 +1,4 @@
+import type { Tool } from "@modelcontextprotocol/sdk/types.js";
 import type Database from "better-sqlite3";
 
 /**
@@ -10,14 +11,9 @@ export interface PluginTool {
 	description: string;
 	/**
 	 * JSON Schema for the tool's input parameters.
-	 * Use the standard JSON Schema object format (same as the MCP Tool.inputSchema field).
+	 * Must be a valid MCP tool inputSchema (type: "object" with properties).
 	 */
-	inputSchema: {
-		type: "object";
-		properties?: Record<string, unknown>;
-		required?: string[];
-		[key: string]: unknown;
-	};
+	inputSchema: Tool["inputSchema"];
 	/** Handler function — receives raw args and db handle, returns any serializable value */
 	handler: (args: Record<string, unknown>, db: Database.Database) => unknown;
 }

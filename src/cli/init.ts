@@ -156,6 +156,11 @@ export function runInit(): void {
 			console.log(
 				"2. AI agents will now follow the memory ritual automatically",
 			);
+			console.log("");
+			console.log("Plugin support:");
+			console.log(
+				"  Drop .plugin.mjs files into ~/.hontoni-mcp/plugins/ to add custom tools.",
+			);
 			return;
 		} catch (error) {
 			console.error("❌ Failed to append to AGENTS.md:", error);
@@ -189,6 +194,11 @@ export function runInit(): void {
 		console.log("Next steps:");
 		console.log("1. Configure your MCP client to use hontoni-mcp-memory");
 		console.log("2. AI agents will now follow the memory ritual automatically");
+		console.log("");
+		console.log("Plugin support:");
+		console.log(
+			"  Drop .plugin.mjs files into ~/.hontoni-mcp/plugins/ to add custom tools.",
+		);
 	} catch (error) {
 		console.error("❌ Failed to create AGENTS.md:", error);
 		process.exit(1);
