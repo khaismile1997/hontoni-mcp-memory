@@ -47,8 +47,8 @@ Flags:
   -f, --force     Overwrite entire file
 
 Storage:
-  Memory is stored locally at ~/.hontoni-memory/memory.db
-  Set HONTONI_MEMORY_DIR to customize location.
+  Memory is stored locally at ~/.hontoni-mcp/memory.db
+  Set HONTONI_DATA_DIR to customize location.
 
 Documentation:
   https://github.com/khaismile1997/hontoni-mcp-memory
@@ -77,6 +77,26 @@ async function main() {
 	const plugins = await loadPlugins(config.pluginsDir, db);
 	for (const plugin of plugins) {
 		for (const tool of plugin.tools) {
+			// Guard: refuse to overwrite built-in tools or already-registered plugin tools
+			if (registry.has(tool.name)) {
+				console.error(
+					`[hontoni-memory] Warning: Plugin "${plugin.name}" tried to register tool "${tool.name}" which is already registered. Skipping.`,
+				);
+				continue;
+			}
+
+			// Guard: inputSchema must be a valid MCP object schema
+			if (
+				!tool.inputSchema ||
+				typeof tool.inputSchema !== "object" ||
+				(tool.inputSchema as Record<string, unknown>)["type"] !== "object"
+			) {
+				console.error(
+					`[hontoni-memory] Warning: Plugin "${plugin.name}" tool "${tool.name}" has an invalid inputSchema (must be type:"object"). Skipping.`,
+				);
+				continue;
+			}
+
 			registry.set(tool.name, {
 				schema: {
 					name: tool.name,
@@ -85,12 +105,49 @@ async function main() {
 				},
 				handler: (args) => {
 					try {
-						const result = tool.handler(args, db);
+						const resultOrPromise = tool.handler(args, db);
+						// Support both sync and async handlers
+						if (
+							resultOrPromise !== null &&
+							typeof resultOrPromise === "object" &&
+							"then" in resultOrPromise &&
+							typeof (resultOrPromise as Promise<unknown>).then === "function"
+						) {
+							// Async handler: we cannot await inside a sync ToolHandler,
+							// so we return a settled Promise result. The MCP SDK handles
+							// async request handlers at the call-site level; plugin handlers
+							// should prefer sync where possible.
+							return (resultOrPromise as Promise<unknown>).then(
+								(result) => ({
+									content: [
+										{
+											type: "text" as const,
+											text: JSON.stringify(result, null, 2),
+										},
+									],
+								}),
+								(error: unknown) => ({
+									content: [
+										{
+											type: "text" as const,
+											text: JSON.stringify({
+												error:
+													error instanceof Error
+														? error.message
+														: String(error),
+											}),
+										},
+									],
+								}),
+							) as unknown as {
+								content: Array<{ type: "text"; text: string }>;
+							};
+						}
 						return {
 							content: [
 								{
 									type: "text" as const,
-									text: JSON.stringify(result, null, 2),
+									text: JSON.stringify(resultOrPromise, null, 2),
 								},
 							],
 						};

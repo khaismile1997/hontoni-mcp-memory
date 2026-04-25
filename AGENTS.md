@@ -1,40 +1,92 @@
 # Agent Instructions
 
-This project uses **bd** (beads) for issue tracking. Run `bd onboard` to get started.
+MCP server providing persistent memory and session management for Claude Code via SQLite + FTS5.
 
-## Quick Reference
+## Tech Stack
+
+| Category | Technology |
+|----------|------------|
+| Runtime | Node.js >= 18 |
+| Language | TypeScript (ES2022, NodeNext) |
+| Database | better-sqlite3 ^11.0.0 with FTS5 |
+| MCP SDK | @modelcontextprotocol/sdk ^1.0.0 |
+| Validation | zod ^3.23.0 |
+| Testing | Vitest ^4.1.4 |
+
+## Structure
+
+```
+src/
+├── index.ts          # Entry point
+├── server.ts         # MCP tool registration + dispatch
+├── cli/              # CLI commands (init.ts)
+├── tools/            # 8 MCP tools (observation, memory_*, session_*, compact_*)
+├── db/
+│   ├── schema.ts     # SQLite schema + FTS5 triggers
+│   └── queries.ts    # DB operations
+├── prompts/          # MCP prompts (memory_ritual)
+└── utils/            # Config, path helpers
+tests/                # Vitest tests (42 passing)
+```
+
+## Commands
+
+```bash
+npm run build       # tsc → dist/
+npm run test        # vitest run (42 tests)
+npm run typecheck   # tsc --noEmit
+npm run dev         # tsc --watch
+```
+
+## Code Example (Tool Registration)
+
+```typescript
+// src/server.ts:23-34
+export function registerTools(): Tool[] {
+  return [
+    observationTool,      // Create structured observations
+    memorySearchTool,     // FTS5 search
+    memoryGetTool,        // Fetch by ID
+    memoryTimelineTool,   // Chronological context
+    sessionSaveTool,      // Persist session state
+    sessionLoadTool,      // Load session state
+    compactPrepareTool,   // Prepare for compaction
+    memoryAdminTool,      // Archive, vacuum, migrate
+  ];
+}
+```
+
+## Conventions
+
+- **MCP tools**: Each tool in `src/tools/{name}.ts` exports `{name}Tool` (schema) and `handle{Name}` (handler)
+- **Schema**: SQLite triggers keep FTS5 in sync automatically — never modify schema without updating triggers
+- **WAL mode**: Enabled for concurrent access
+- **Storage**: `~/.hontoni-memory/memory.db` (configurable via `HONTONI_MEMORY_DIR`)
+
+## Always / Ask / Never
+
+- **Always**: Run `npm run typecheck` + `npm run test` before committing
+- **Ask**: Before adding dependencies, changing `.opencode/` structure, or force-pushing
+- **Never**: Edit `dist/` directly · Skip FTS5 sync triggers · Commit `.env` or credentials
+
+## Shell Safety
+
+Always use non-interactive flags — `cp`, `mv`, `rm` may be aliased to prompt on this system:
+
+```bash
+cp -f src dst    mv -f src dst    rm -f file    rm -rf dir
+```
+
+## Issue Tracking
+
+Uses **bd** (beads). Run `bd onboard` to get started.
 
 ```bash
 bd ready              # Find available work
-bd show <id>          # View issue details
-bd update <id> --claim  # Claim work atomically
+bd update <id> --claim  # Claim atomically
 bd close <id>         # Complete work
-bd dolt push          # Push beads data to remote
+bd dolt push          # Sync to remote
 ```
-
-## Non-Interactive Shell Commands
-
-**ALWAYS use non-interactive flags** with file operations to avoid hanging on confirmation prompts.
-
-Shell commands like `cp`, `mv`, and `rm` may be aliased to include `-i` (interactive) mode on some systems, causing the agent to hang indefinitely waiting for y/n input.
-
-**Use these forms instead:**
-```bash
-# Force overwrite without prompting
-cp -f source dest           # NOT: cp source dest
-mv -f source dest           # NOT: mv source dest
-rm -f file                  # NOT: rm file
-
-# For recursive operations
-rm -rf directory            # NOT: rm -r directory
-cp -rf source dest          # NOT: cp -r source dest
-```
-
-**Other commands that may prompt:**
-- `scp` - use `-o BatchMode=yes` for non-interactive
-- `ssh` - use `-o BatchMode=yes` to fail instead of prompting
-- `apt-get` - use `-y` flag
-- `brew` - use `HOMEBREW_NO_AUTO_UPDATE=1` env var
 
 <!-- BEGIN BEADS INTEGRATION profile:full hash:d4f96305 -->
 ## Issue Tracking with bd (beads)

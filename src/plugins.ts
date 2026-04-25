@@ -6,12 +6,38 @@ import type Database from "better-sqlite3";
 import type { MemoryPlugin } from "./plugin.js";
 
 /**
+ * Allowlist of SQL statement prefixes permitted in plugin migrations.
+ * Only additive DDL is allowed; destructive or data-modifying statements are rejected.
+ */
+const ALLOWED_MIGRATION_PREFIXES = [
+	"create table",
+	"create index",
+	"create unique index",
+	"create virtual table",
+];
+
+/**
+ * Validate a single SQL statement from a plugin migration.
+ * Returns an error string if the statement is not allowed, or null if it is safe.
+ */
+function validateMigrationStatement(statement: string): string | null {
+	const normalized = statement.trim().toLowerCase();
+	if (!normalized) return null; // empty/whitespace-only statements are fine to skip
+
+	for (const prefix of ALLOWED_MIGRATION_PREFIXES) {
+		if (normalized.startsWith(prefix)) return null;
+	}
+
+	return `Statement not permitted in migrations (only CREATE TABLE/INDEX IF NOT EXISTS allowed): "${statement.trim().slice(0, 80)}"`;
+}
+
+/**
  * Load all `.plugin.mjs` files from `pluginsDir`.
  *
  * Behavior:
  * - Non-existent or empty dir → returns `[]`
  * - Broken plugin (syntax error, missing required fields) → logs warning, skips, continues
- * - Migration SQL errors → logs warning, skips that migration, continues loading the plugin
+ * - Migration SQL errors or forbidden statements → logs warning, skips that migration, continues loading the plugin
  *
  * SQLite convention: plugin tables must use the `plugin_<name>_<table>` prefix
  * and always use `CREATE TABLE IF NOT EXISTS` (migrations are idempotent).
@@ -72,8 +98,23 @@ export async function loadPlugins(
 			continue;
 		}
 
-		// Run migrations (idempotent — must use IF NOT EXISTS)
+		// Run migrations (idempotent — must use CREATE TABLE/INDEX IF NOT EXISTS)
 		for (const sql of plugin.migrations ?? []) {
+			// Validate each semicolon-separated statement before execution
+			const statements = sql.split(";").filter((s) => s.trim().length > 0);
+			let migrationValid = true;
+			for (const stmt of statements) {
+				const validationError = validateMigrationStatement(stmt);
+				if (validationError) {
+					console.error(
+						`[hontoni-memory] Warning: Plugin "${plugin.name}" migration rejected — ${validationError}. Skipping this migration.`,
+					);
+					migrationValid = false;
+					break;
+				}
+			}
+			if (!migrationValid) continue;
+
 			try {
 				db.exec(sql);
 			} catch (err) {

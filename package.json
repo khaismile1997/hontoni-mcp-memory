@@ -4,6 +4,16 @@
 	"description": "MCP server for memory and session management with Claude Code",
 	"type": "module",
 	"main": "dist/index.js",
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"types": "./dist/index.d.ts"
+		},
+		"./plugin": {
+			"import": "./dist/plugin.js",
+			"types": "./dist/plugin.d.ts"
+		}
+	},
 	"bin": {
 		"hontoni-mcp-memory": "dist/index.js"
 	},

@@ -35,3 +35,7 @@ npm-debug.log*
 
 # Dolt database files (added by bd init)
 .dolt/
+
+.opencode/
+.opencode.backup-*/
+.beads/
